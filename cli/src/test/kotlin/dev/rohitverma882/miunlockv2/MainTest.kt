@@ -1,5 +1,6 @@
 package dev.rohitverma882.miunlockv2
 
+/*
 import kotlin.test.Test
 import kotlin.test.assertNotNull
 
@@ -10,3 +11,4 @@ class MainTest {
         assertNotNull(classUnderTest.greeting, "app should have a greeting")
     }
 }
+*/

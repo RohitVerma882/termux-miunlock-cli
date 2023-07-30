@@ -1,34 +1,34 @@
 @file:Suppress("UnstableApiUsage")
 
 plugins {
-    // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
     id("org.jetbrains.kotlin.jvm") version "1.8.20"
-
-    // Apply the application plugin to add support for building a CLI application in Java.
     application
 }
 
 repositories {
-    // Use Maven Central for resolving dependencies.
     mavenCentral()
 }
 
 dependencies {
-    // This dependency is used by the application.
-
+    implementation("info.picocli:picocli:4.7.4")
+    implementation("com.google.guava:guava:29.0-jre")
+    implementation("commons-codec:commons-codec:1.11")
+    implementation("commons-io:commons-io:2.6")
+    implementation("commons-logging:commons-logging:1.2")
+    implementation("org.apache.commons:commons-compress:1.17")
+    implementation("org.apache.commons:commons-lang3:3.7")
+    implementation("org.apache.httpcomponents:httpclient:4.5.5")
+    implementation("org.json:json:20180130")
 }
 
 testing {
     suites {
-        // Configure the built-in test suite
         val test by getting(JvmTestSuite::class) {
-            // Use Kotlin Test test framework
             useKotlinTest("1.8.20")
         }
     }
 }
 
-// Apply a specific Java toolchain to ease working on different environments.
 java {
     toolchain {
         languageVersion.set(JavaLanguageVersion.of(17))
@@ -36,6 +36,5 @@ java {
 }
 
 application {
-    // Define the main class for the application.
     mainClass.set("dev.rohitverma882.miunlockv2.MainKt")
 }
