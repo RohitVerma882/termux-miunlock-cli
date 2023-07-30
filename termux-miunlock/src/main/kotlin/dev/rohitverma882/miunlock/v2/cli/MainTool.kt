@@ -1,6 +1,6 @@
-package dev.rohitverma882.miunlockv2.cli
+package dev.rohitverma882.miunlock.v2.cli
 
-import dev.rohitverma882.miunlockv2.utils.Utils
+import dev.rohitverma882.miunlock.v2.utils.Utils
 
 import picocli.CommandLine
 import picocli.CommandLine.Command
@@ -41,7 +41,7 @@ class MainTool : Callable<Int> {
         paramLabel = "REGION",
         completionCandidates = RegionCandidates::class,
         description = ["Tool server host regions: \${COMPLETION-CANDIDATES}"],
-        defaultValue = "unknown",
+        defaultValue = "other",
         showDefaultValue = CommandLine.Help.Visibility.ALWAYS
     )
     private lateinit var region: String

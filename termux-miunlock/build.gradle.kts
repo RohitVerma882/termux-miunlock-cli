@@ -34,6 +34,5 @@ java {
 }
 
 application {
-    mainClass.set("dev.rohitverma882.miunlockv2.cli.MainKt")
-    applicationName = "Termux-MiUnlockV2"
+    mainClass.set("dev.rohitverma882.miunlock.v2.cli.MainKt")
 }

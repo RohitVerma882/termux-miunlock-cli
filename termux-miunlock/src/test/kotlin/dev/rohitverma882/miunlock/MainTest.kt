@@ -1,4 +1,4 @@
-package dev.rohitverma882.miunlockv2
+package dev.rohitverma882.miunlock
 
 /*
 import kotlin.test.Test
