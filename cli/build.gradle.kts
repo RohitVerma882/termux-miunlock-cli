@@ -1,5 +1,3 @@
-@file:Suppress("UnstableApiUsage")
-
 plugins {
     id("org.jetbrains.kotlin.jvm") version "1.8.20"
     application
@@ -21,13 +19,13 @@ dependencies {
     implementation("org.json:json:20180130")
 }
 
-testing {
-    suites {
-        val test by getting(JvmTestSuite::class) {
-            useKotlinTest("1.8.20")
-        }
-    }
-}
+//testing {
+//    suites {
+//        val test by getting(JvmTestSuite::class) {
+//            useKotlinTest("1.8.20")
+//        }
+//    }
+//}
 
 java {
     toolchain {
@@ -36,5 +34,6 @@ java {
 }
 
 application {
-    mainClass.set("dev.rohitverma882.miunlockv2.MainKt")
+    mainClass.set("dev.rohitverma882.miunlockv2.cli.MainKt")
+    applicationName = "Termux-MiUnlockV2"
 }
