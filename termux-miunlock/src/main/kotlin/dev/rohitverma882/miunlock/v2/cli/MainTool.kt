@@ -1,6 +1,7 @@
 package dev.rohitverma882.miunlock.v2.cli
 
 import dev.rohitverma882.miunlock.v2.utils.Utils
+
 import org.apache.commons.codec.DecoderException
 import org.apache.commons.codec.binary.Hex
 
@@ -9,6 +10,7 @@ import picocli.CommandLine.Command
 import picocli.CommandLine.Option
 
 import java.util.concurrent.Callable
+import java.nio.charset.StandardCharsets
 
 @Command(
     name = "termux-miunlock",
@@ -54,7 +56,7 @@ class MainTool : Callable<Int> {
     @Option(
         names = ["--data"],
         paramLabel = "DATA",
-        description = ["Install 'miunlock-account.apk' from repo, login and copypaste the response."],
+        description = ["Install 'miunlock-account-v2.apk' from repo, login and copypaste the response."],
         required = true
     )
     private lateinit var loginData: String
@@ -64,9 +66,12 @@ class MainTool : Callable<Int> {
         println("INFO: Using host '$host' for '$region'")
 
         val jsonData = try {
-            Hex.decodeHex(loginData)
+            String(Hex.decodeHex(loginData), StandardCharsets.UTF_8)
         } catch (e: DecoderException) {
-            e.printStackTrace()
+            println("FAIL: Unable to decode data! add '--debug' to show more info.")
+            if (debug) {
+                e.printStackTrace()
+            }
             return 1
         }
 
