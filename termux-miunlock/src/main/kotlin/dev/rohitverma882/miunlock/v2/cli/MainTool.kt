@@ -5,35 +5,37 @@ import dev.rohitverma882.miunlock.v2.utils.Utils
 import picocli.CommandLine
 import picocli.CommandLine.Command
 import picocli.CommandLine.Option
-import picocli.CommandLine.Parameters
 
 import java.util.concurrent.Callable
 
 @Command(
     name = "termux-miunlock",
-    version = ["1.0"],
+    versionProvider = VersionProvider::class,
+    footer = ["Copyright(c) 2023"],
     description = ["A program that can be used to retrieve the bootloader unlock token for @|bold Xiaomi|@ devices. (and unlock the bootloader) using @|bold Termux|@."],
     mixinStandardHelpOptions = true,
-    usageHelpAutoWidth = true
+    showEndOfOptionsDelimiterInUsageHelp = true,
+    usageHelpAutoWidth = true,
+    sortOptions = false,
+    sortSynopsis = false,
+    showDefaultValues = true,
+    separator = "::",
+    requiredOptionMarker = '*',
+    abbreviateSynopsis = true
 )
 class MainTool : Callable<Int> {
     @Option(
-        names = ["--help"],
-        usageHelp = true,
-        description = ["Display a help message"]
+        names = ["--help"], usageHelp = true, description = ["Display a help message"]
     )
     private var help: Boolean = false
 
     @Option(
-        names = ["--version"],
-        versionHelp = true,
-        description = ["Version information"]
+        names = ["--version"], versionHelp = true, description = ["Version information"]
     )
     private var version: Boolean = false
 
     @Option(
-        names = ["--debug"],
-        description = ["Output messages about what the tool is doing"],
+        names = ["--debug"], description = ["Output messages about what the tool is doing"]
     )
     private var debug: Boolean = false
 
@@ -43,20 +45,24 @@ class MainTool : Callable<Int> {
         completionCandidates = RegionCandidates::class,
         description = ["Tool server host regions: \${COMPLETION-CANDIDATES}"],
         defaultValue = "india",
-        showDefaultValue = CommandLine.Help.Visibility.ALWAYS,
-        interactive = true
+        showDefaultValue = CommandLine.Help.Visibility.ALWAYS
     )
     private lateinit var region: String
 
-    @Parameters(
+    @Option(
+        names = ["--data"],
         paramLabel = "DATA",
-        description = ["Install 'miunlock-account.apk' from repo, login and copypaste the response."]
+        description = ["Install 'miunlock-account.apk' from repo, login and copypaste the response."],
+        required = true
     )
-    private var loginData: String? = null
+    private lateinit var loginData: String
 
     override fun call(): Int {
-//        var host = Utils.hosts[region] ?: Utils.hosts[2]!!
-        val host = Utils.hosts[region]!!
-        return 0
+        val host = (Utils.hosts[region] ?: Utils.hosts["india"]!!)
+        println("INFO: Using host '$host' for '$region'")
+
+        println(loginData)
+        // println("Install 'miunlock-account.apk' from repo, login and copypaste the response to here: ")
+        return CommandLine.ExitCode.OK
     }
 }

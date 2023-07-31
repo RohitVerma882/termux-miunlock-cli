@@ -5,7 +5,6 @@ import picocli.CommandLine
 import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
-    val mainTool = MainTool()
-    val exitCode = CommandLine(mainTool).execute(*args)
+    val exitCode = CommandLine(MainTool()).execute(*args)
     exitProcess(exitCode)
 }
