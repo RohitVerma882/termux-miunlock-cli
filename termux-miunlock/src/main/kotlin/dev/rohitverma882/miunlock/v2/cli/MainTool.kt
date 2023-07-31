@@ -1,6 +1,8 @@
 package dev.rohitverma882.miunlock.v2.cli
 
 import dev.rohitverma882.miunlock.v2.utils.Utils
+import org.apache.commons.codec.DecoderException
+import org.apache.commons.codec.binary.Hex
 
 import picocli.CommandLine
 import picocli.CommandLine.Command
@@ -61,8 +63,14 @@ class MainTool : Callable<Int> {
         val host = (Utils.hosts[region] ?: Utils.hosts["india"]!!)
         println("INFO: Using host '$host' for '$region'")
 
-        println(loginData)
-        // println("Install 'miunlock-account.apk' from repo, login and copypaste the response to here: ")
+        val jsonData = try {
+            Hex.decodeHex(loginData)
+        } catch (e: DecoderException) {
+            e.printStackTrace()
+            return 1
+        }
+
+        println("INFO: $jsonData")
         return CommandLine.ExitCode.OK
     }
 }
