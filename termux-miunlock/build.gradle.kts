@@ -19,6 +19,18 @@ dependencies {
     implementation("org.json:json:20180130")
 }
 
+tasks.compileJava {
+    options.encoding = "UTF-8"
+}
+
+sourceSets {
+    main {
+        kotlin.srcDir("src/main/kotlin")
+        java.srcDir("src/main/kotlin")
+        resources.srcDir("src/main/resources")
+    }
+}
+
 //testing {
 //    suites {
 //        val test by getting(JvmTestSuite::class) {
