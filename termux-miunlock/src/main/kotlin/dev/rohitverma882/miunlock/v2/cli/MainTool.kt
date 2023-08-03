@@ -52,6 +52,8 @@ class MainTool : Callable<Int> {
     )
     private var isDebug: Boolean = false
 
+    private lateinit var host: String
+
     @Option(
         names = ["--region"],
         paramLabel = "REGION",
@@ -60,7 +62,13 @@ class MainTool : Callable<Int> {
         defaultValue = "india",
         showDefaultValue = CommandLine.Help.Visibility.ALWAYS
     )
-    private lateinit var region: String
+    private fun setRegionHost(region: String) {
+        if (Utils.hosts.containsKey(region)) {
+            host = (Utils.hosts[region] ?: Utils.hosts["india"]!!)
+        } else {
+            throw ParameterException(spec.commandLine(), "Invalid --region value: $region")
+        }
+    }
 
     @Spec
     private lateinit var spec: CommandSpec
@@ -98,17 +106,13 @@ class MainTool : Callable<Int> {
         val keystore = XiaomiKeystore.getInstance()
         keystore.setCredentials(userId, passToken, deviceId)
         logger.info("Logged in succesfully: $userId")
-
-        val host = (Utils.hosts[region] ?: Utils.hosts["india"]!!)
-        logger.info("Using host: ${host.replace("https://", "")}, region: $region")
-
         logger.info("Starting unlock procedure")
 
 //        dummy token and product
         val token = "bvoohI51kPc6EvH/sxlzxDhsjLM="
         val product = "wayne"
 
-        logger.info("First trial unlock token: $token")
+        if (isDebug) logger.info("First trial unlock token: $token")
         try {
             val info = UnlockCommonRequests.userInfo(host)
             if (!info.isNullOrBlank() && isDebug) {
@@ -149,8 +153,8 @@ class MainTool : Callable<Int> {
                 logger.error("Server description: $description")
             } else {
                 UNLOCK_TOKEN_CACHE[token] = encryptedData
+                if (isDebug) logger.info("Unlock token: $encryptedData")
             }
-            logger.info("Unlock token: $encryptedData")
         } catch (e: Exception) {
             logger.error("Internal error while parsing unlock data: ${e.message}")
             return 1
