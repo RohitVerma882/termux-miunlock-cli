@@ -11,8 +11,11 @@ import org.json.JSONObject
 
 import picocli.CommandLine
 import picocli.CommandLine.Command
+import picocli.CommandLine.Model.CommandSpec
 import picocli.CommandLine.Option
+import picocli.CommandLine.ParameterException
 import picocli.CommandLine.Parameters
+import picocli.CommandLine.Spec
 
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.Callable
@@ -23,7 +26,7 @@ import java.util.concurrent.Callable
     footer = ["Copyright(c) 2023"],
     description = ["A program that can be used to retrieve the bootloader unlock token for @|bold Xiaomi|@ devices. (and unlock the bootloader) using @|bold Termux|@."],
     mixinStandardHelpOptions = true,
-    showEndOfOptionsDelimiterInUsageHelp = true,
+//    showEndOfOptionsDelimiterInUsageHelp = true,
     usageHelpAutoWidth = true,
     sortOptions = false,
     sortSynopsis = false,
@@ -58,46 +61,52 @@ class MainTool : Callable<Int> {
     )
     private lateinit var region: String
 
+    @Spec
+    private lateinit var spec: CommandSpec
+
+    private var passToken: String? = null
+    private var userId: String? = null
+    private var deviceId: String? = null
+
     @Parameters(
         paramLabel = "DATA",
         description = ["Install 'miunlock-account-v2.apk' from repo, login and copypaste the response."],
     )
-    private lateinit var loginData: String
-    
-    @Spec
-    private lateinit var spec : CommandSpec
-
-    override fun call(): Int {
+    private fun setLoginData(data: String) {
         val jsonData = try {
-            String(Hex.decodeHex(loginData), StandardCharsets.UTF_8)
+            String(Hex.decodeHex(data), StandardCharsets.UTF_8)
         } catch (e: DecoderException) {
-            println("FAIL: Unable to decode response data: ${e.message}")
-            return 1
+            throw ParameterException(
+                spec.commandLine(),
+                "Decode response data failed: ${e.message}"
+            )
         }
-
-        val passToken: String?
-        val userId: String?
-        val deviceId: String?
         try {
             val json = JSONObject(jsonData)
             passToken = json.getString("passToken")
             userId = json.getString("userId")
             deviceId = json.getString("deviceId")
         } catch (e: JSONException) {
-            println("FAIL: Unable to parse response data: ${e.message}")
-            return 1
+            throw ParameterException(spec.commandLine(), "Parse response data failed: ${e.message}")
         }
+    }
 
+    private val UNLOCK_TOKEN_CACHE: HashMap<String, String> = HashMap()
+
+    override fun call(): Int {
         val keystore = XiaomiKeystore.getInstance()
         keystore.setCredentials(userId, passToken, deviceId)
         println("INFO: Logged in succesfully: $userId")
 
         val host = (Utils.hosts[region] ?: Utils.hosts["india"]!!)
-        println("INFO: Using host '$host' for '$region'")
+        println("INFO: Using host: $host, region: $region")
 
         println("INFO: Starting unlock procedure")
+
+//        dummy token and product
         val token = "bvoohI51kPc6EvH/sxlzxDhsjLM="
         val product = "wayne"
+
         println("INFO: First trial unlock token: $token")
         try {
             val info = UnlockCommonRequests.userInfo(host)
@@ -118,7 +127,26 @@ class MainTool : Callable<Int> {
 
         try {
             val unlockData = UnlockCommonRequests.ahaUnlock(host, token, product, "", "", "");
-            println("INFO: Unlock request response: $unlockData");
+            if (!unlockData.isNullOrBlank() && isDebug) {
+                println("INFO: Unlock request response: $unlockData")
+            }
+            val json = JSONObject(unlockData)
+            val code = json.optInt("code", -100)
+            val description = json.optString("descEN", "empty")
+            val encryptedData = json.optString("encryptedData", null)
+            if (code != 0 && encryptedData.isNullOrBlank()) {
+                println(
+                    "Failed to unlock your device, Xiaomi server returned error $code:\\nError description: ${
+                        UnlockCommonRequests.getUnlockCodeMeaning(
+                            code,
+                            json
+                        )
+                    }\\nServer description: $description"
+                )
+            } else {
+                UNLOCK_TOKEN_CACHE[token] = encryptedData
+            }
+            println(encryptedData)
         } catch (e: Exception) {
             println("FAIL: Internal error while parsing unlock data: ${e.message}")
             return 1

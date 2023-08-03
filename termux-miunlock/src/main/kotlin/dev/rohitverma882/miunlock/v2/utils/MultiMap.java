@@ -7,11 +7,7 @@ import java.util.Map;
 
 public class MultiMap<K, V> extends HashMap<K, List<V>> {
     public void putSingle(K key, V value) {
-        List<V> entry = super.get(key);
-        if (entry == null) {
-            entry = new ArrayList<>();
-            super.put(key, entry);
-        }
+        List<V> entry = super.computeIfAbsent(key, k -> new ArrayList<>());
         entry.add(value);
     }
 

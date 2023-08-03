@@ -9,5 +9,16 @@ class Utils {
             "russia" to "https://ru-unlock.update.intl.miui.com",
             "europe" to "https://eu-unlock.update.intl.miui.com"
         )
+
+        @JvmStatic
+        fun findJsonStart(data: String): String? {
+            val d = data.toCharArray()
+            for (i in d.indices) {
+                if (d[i] == '{') {
+                    return data.substring(i)
+                }
+            }
+            return null
+        }
     }
 }
