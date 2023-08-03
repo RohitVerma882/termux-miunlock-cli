@@ -1,7 +1,7 @@
 package dev.rohitverma882.miunlock.v2.utils;
 
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import dev.rohitverma882.miunlock.v2.inet.CustomHttpException;
@@ -10,7 +10,11 @@ import dev.rohitverma882.miunlock.v2.inet.EasyResponse;
 
 public class InetUtils {
     public static String urlEncode(String data) {
-        return URLEncoder.encode(data, StandardCharsets.UTF_8);
+        try {
+            return URLEncoder.encode(data, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            return null;
+        }
     }
 
     public static String getRedirectUrl(String url) throws CustomHttpException {

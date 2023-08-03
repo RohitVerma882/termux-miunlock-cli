@@ -108,7 +108,7 @@ public class UnlockCommonRequests {
         String data = new JSONObject(pp).toString(3);
         data = Base64.getEncoder().encodeToString(data.getBytes(StandardCharsets.UTF_8));
         request.addParam("data", data);
-        request.addNonce(host);
+        request.addNonce();
         request.addParam("sid", SID);
         return request.exec();
     }
@@ -137,7 +137,7 @@ public class UnlockCommonRequests {
         data = Base64.getEncoder().encodeToString(data.getBytes(StandardCharsets.UTF_8));
         request.addParam("appId", "1");
         request.addParam("data", data);
-        request.addNonce(host);
+        request.addNonce();
         request.addParam("sid", SID);
         return request.exec();
     }
@@ -170,7 +170,7 @@ public class UnlockCommonRequests {
         data = Base64.getEncoder().encodeToString(data.getBytes(StandardCharsets.UTF_8));
         request.addParam("appId", "1");
         request.addParam("data", data);
-        request.addNonce(host);
+        request.addNonce();
         request.addParam("sid", SID);
         return request.exec();
     }

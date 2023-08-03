@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class EasyHttp {
     public static final String CHROME_USERAGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36";
-    private static final boolean DEBUG_PROXY = false; // Log.ADVANCED_LOG;
+    private static final boolean DEBUG_PROXY = false;
     protected CustomHttpRequest request = new CustomHttpRequest();
     private boolean headOnly = false;
     private final Map<String, String> cookies = new LinkedHashMap<>();

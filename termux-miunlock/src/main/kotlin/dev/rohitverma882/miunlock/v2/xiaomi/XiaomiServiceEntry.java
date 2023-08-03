@@ -13,11 +13,13 @@ import dev.rohitverma882.miunlock.v2.inet.EasyHttp;
 import dev.rohitverma882.miunlock.v2.inet.EasyResponse;
 import dev.rohitverma882.miunlock.v2.utils.InetUtils;
 import dev.rohitverma882.miunlock.v2.utils.Utils;
+import dev.rohitverma882.miunlock.v2.utils.StrUtils;
+
 
 public class XiaomiServiceEntry {
     private static final String URL_FIRST = "https://account.xiaomi.com/pass/serviceLogin?sid=%s&_json=true&passive=true&hidden=false";
-    private final XiaomiKeystore keystore;
-    private final String id;
+    private XiaomiKeystore keystore;
+    private String id;
     private String serviceToken;
     private String ssecurity;
     private String psecurity;
@@ -55,7 +57,7 @@ public class XiaomiServiceEntry {
         EasyResponse response;
         response = request.exec();
         String body = response.getBody();
-        body = Utils.findJsonStart(body);
+        body = StrUtils.findJsonStart(body);
         if (body == null) {
             throw new XiaomiProcedureException("[getSSecurity] Failed to find SSecurity json");
         }

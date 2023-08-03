@@ -57,4 +57,14 @@ public class StrUtils {
         }
         return new String(ic);
     }
+    
+    public static String findJsonStart(String data) {
+        char[] d = data.toCharArray();
+        for (int i = 0; i < d.length; ++i) {
+            if (d[i] == '{') {
+                return data.substring(i);
+            }
+        }
+        return null;
+    }
 }

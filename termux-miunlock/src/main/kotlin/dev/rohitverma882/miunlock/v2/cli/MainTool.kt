@@ -63,6 +63,9 @@ class MainTool : Callable<Int> {
         description = ["Install 'miunlock-account-v2.apk' from repo, login and copypaste the response."],
     )
     private lateinit var loginData: String
+    
+    @Spec
+    private lateinit var spec : CommandSpec
 
     override fun call(): Int {
         val jsonData = try {
@@ -98,7 +101,7 @@ class MainTool : Callable<Int> {
         println("INFO: First trial unlock token: $token")
         try {
             val info = UnlockCommonRequests.userInfo(host)
-            if (info.isNullOrBlank() && isDebug) {
+            if (!info.isNullOrBlank() && isDebug) {
                 println("INFO: Unlock request user info: $info")
             }
             try {
@@ -106,7 +109,7 @@ class MainTool : Callable<Int> {
             } catch (_: Exception) {
             }
             val alert = UnlockCommonRequests.deviceClear(host, product)
-            if (alert.isNullOrBlank() && isDebug) {
+            if (!alert.isNullOrBlank() && isDebug) {
                 println("INFO: Unlock request device clear: $alert")
             }
         } catch (e: Exception) {
@@ -118,6 +121,7 @@ class MainTool : Callable<Int> {
             println("INFO: Unlock request response: $unlockData");
         } catch (e: Exception) {
             println("FAIL: Internal error while parsing unlock data: ${e.message}")
+            return 1
         }
 
         XiaomiKeystore.clear()

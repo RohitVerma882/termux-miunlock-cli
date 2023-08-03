@@ -15,7 +15,7 @@ import dev.rohitverma882.miunlock.v2.xiaomi.XiaomiProcedureException;
 
 public class UnlockRequest {
     private static final String SERVICE_NAME = "unlockApi";
-    private final HashMap<String, String> headers = new HashMap<>();
+    private HashMap<String, String> headers = new HashMap<>();
     private String path;
     private String host;
     private HttpQuery params = new HttpQuery();
@@ -72,7 +72,7 @@ public class UnlockRequest {
         params.put(key, value);
     }
 
-    public void addNonce(String host) throws XiaomiProcedureException, CustomHttpException {
+    public void addNonce() throws XiaomiProcedureException, CustomHttpException {
         String json = UnlockCommonRequests.nonceV2(host);
         try {
             JSONObject obj = new JSONObject(json);
