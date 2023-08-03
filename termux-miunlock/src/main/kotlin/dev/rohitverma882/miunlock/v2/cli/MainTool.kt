@@ -1,5 +1,6 @@
 package dev.rohitverma882.miunlock.v2.cli
 
+import dev.rohitverma882.miunlock.v2.logging.impl.DefaultCliLogger
 import dev.rohitverma882.miunlock.v2.utils.Utils
 import dev.rohitverma882.miunlock.v2.xiaomi.XiaomiKeystore
 import dev.rohitverma882.miunlock.v2.xiaomi.unlock.UnlockCommonRequests
@@ -77,41 +78,41 @@ class MainTool : Callable<Int> {
             String(Hex.decodeHex(data), StandardCharsets.UTF_8)
         } catch (e: DecoderException) {
             throw ParameterException(
-                spec.commandLine(),
-                "Decode response data failed: ${e.message}"
+                spec.commandLine(), "Decode response data failed: ${e.message}"
             )
         }
         try {
             val json = JSONObject(jsonData)
-            passToken = json.getString("passToken")
-            userId = json.getString("userId")
-            deviceId = json.getString("deviceId")
+            passToken = json.optString("passToken", null)
+            userId = json.optString("userId", null)
+            deviceId = json.optString("deviceId", null)
         } catch (e: JSONException) {
             throw ParameterException(spec.commandLine(), "Parse response data failed: ${e.message}")
         }
     }
 
     private val UNLOCK_TOKEN_CACHE: HashMap<String, String> = HashMap()
+    private val logger = DefaultCliLogger()
 
     override fun call(): Int {
         val keystore = XiaomiKeystore.getInstance()
         keystore.setCredentials(userId, passToken, deviceId)
-        println("INFO: Logged in succesfully: $userId")
+        logger.info("Logged in succesfully: $userId")
 
         val host = (Utils.hosts[region] ?: Utils.hosts["india"]!!)
-        println("INFO: Using host: $host, region: $region")
+        logger.info("Using host: ${host.replace("https://", "")}, region: $region")
 
-        println("INFO: Starting unlock procedure")
+        logger.info("Starting unlock procedure")
 
 //        dummy token and product
         val token = "bvoohI51kPc6EvH/sxlzxDhsjLM="
         val product = "wayne"
 
-        println("INFO: First trial unlock token: $token")
+        logger.info("First trial unlock token: $token")
         try {
             val info = UnlockCommonRequests.userInfo(host)
             if (!info.isNullOrBlank() && isDebug) {
-                println("INFO: Unlock request user info: $info")
+                logger.info("Unlock request user info: $info")
             }
             try {
                 UnlockCommonRequests.agreeRequest(host)
@@ -119,36 +120,39 @@ class MainTool : Callable<Int> {
             }
             val alert = UnlockCommonRequests.deviceClear(host, product)
             if (!alert.isNullOrBlank() && isDebug) {
-                println("INFO: Unlock request device clear: $alert")
+                logger.info("Unlock request device clear: $alert")
             }
         } catch (e: Exception) {
-            println("WARN: Pre-unlock requests failed: ${e.message}")
+            logger.warn("Pre-unlock requests failed: ${e.message}")
         }
 
         try {
             val unlockData = UnlockCommonRequests.ahaUnlock(host, token, product, "", "", "");
             if (!unlockData.isNullOrBlank() && isDebug) {
-                println("INFO: Unlock request response: $unlockData")
+                logger.info("Unlock request response: $unlockData")
             }
             val json = JSONObject(unlockData)
             val code = json.optInt("code", -100)
             val description = json.optString("descEN", "empty")
             val encryptedData = json.optString("encryptedData", null)
             if (code != 0 && encryptedData.isNullOrBlank()) {
-                println(
-                    "Failed to unlock your device, Xiaomi server returned error $code:\\nError description: ${
-                        UnlockCommonRequests.getUnlockCodeMeaning(
-                            code,
-                            json
-                        )
-                    }\\nServer description: $description"
+                logger.error(
+                    "Failed to unlock your device, Xiaomi server returned error $code"
                 )
+                logger.error(
+                    "Error description: ${
+                        UnlockCommonRequests.getUnlockCodeMeaning(
+                            code, json
+                        )
+                    }"
+                )
+                logger.error("Server description: $description")
             } else {
                 UNLOCK_TOKEN_CACHE[token] = encryptedData
             }
-            println(encryptedData)
+            logger.info("Unlock token: $encryptedData")
         } catch (e: Exception) {
-            println("FAIL: Internal error while parsing unlock data: ${e.message}")
+            logger.error("Internal error while parsing unlock data: ${e.message}")
             return 1
         }
 
