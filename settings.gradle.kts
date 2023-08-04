@@ -3,4 +3,3 @@ plugins {
 }
 
 rootProject.name = "termux-miunlock-cli"
-include("termux-miunlock")

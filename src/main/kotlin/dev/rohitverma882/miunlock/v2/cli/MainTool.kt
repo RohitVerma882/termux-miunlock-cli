@@ -1,5 +1,6 @@
 package dev.rohitverma882.miunlock.v2.cli
 
+import dev.rohitverma882.miunlock.v2.fastboot.FastbootCommons
 import dev.rohitverma882.miunlock.v2.inet.CustomHttpException
 import dev.rohitverma882.miunlock.v2.logging.impl.DefaultCliLogger
 import dev.rohitverma882.miunlock.v2.utility.utils.Utils
@@ -108,24 +109,30 @@ class MainTool : Callable<Int> {
         keystore.setCredentials(userId, passToken, deviceId)
         logger.info("Logged in succesfully: $userId")
 
-        logger.info("Starting unlock procedure")
-        val token = "bvoohI51kPc6EvH/sxlzxDhsjLM="
-//        val token = FastbootCommons.getUnlockToken(serial)
-//        Thread.sleep(400)
-//        if (token == null) {
-//            logger.error("Failed to get the device unlock token: ${FastbootCommons.getLastError(serial)}")
-//            return 1
-//        }
-        if (isDebug) {
-            logger.info("First trial unlock token: $token")
+        val devices = FastbootCommons.devices()
+        val serial = if (devices.isEmpty()) {
+            null
+        } else {
+            devices.first()
         }
-        val product = "wayne"
-//        product = FastbootCommons.getvar("product", serial)
-//        Thread.sleep(600)
-//        if (product == null) {
-//            logger.error("Failed to get fastboot variable product: ${FastbootCommons.getLastError(serial)}")
-//            return 1
-//        }
+
+        if (serial.isNullOrBlank()) {
+            logger.error("No any fastboot devices found")
+            return 1
+        }
+
+        logger.info("Starting unlock procedure")
+        val product = FastbootCommons.getvar("product", serial)
+        Thread.sleep(600)
+        if (product == null) {
+            val lastErr = FastbootCommons.getLastError(
+                serial
+            )
+            logger.error(
+                "Failed to get fastboot variable product: $lastErr"
+            )
+            return 1
+        }
         try {
             logger.info("Checking account unlock availability")
             val info = UnlockCommonRequests.userInfo(host)
@@ -150,12 +157,17 @@ class MainTool : Callable<Int> {
                 .append("If your Xiaomi account has been bound to the device for enough time, the server is going to provide the unlock token and this tool will proceed with the unlock procedure.")
                 .toString()
         )
-//            token = FastbootCommons.getUnlockToken(serial)
-//            if (token == null) {
-//                logger.error("Failed to get the device unlock token: ${FastbootCommons.getLastError(serial)}")
-//                return 1
-//            }
-//            logger.info("Unlock request token: $token")
+        val token = FastbootCommons.getUnlockToken(serial)
+        if (token == null) {
+            val lastErr = FastbootCommons.getLastError(
+                serial
+            )
+            logger.error(
+                "Failed to get the device unlock token: $lastErr"
+            )
+            return 1
+        }
+        logger.info("Unlock request token: $token")
         try {
             logger.info("Requesting device unlock token")
             val unlockData = UnlockCommonRequests.ahaUnlock(host, token, product, "", "", "")
@@ -171,35 +183,29 @@ class MainTool : Callable<Int> {
             val description = json.optString("descEN", "empty")
             val encryptData = json.optString("encryptData", null)
             if (code != 0 && encryptData.isNullOrBlank()) {
+                val commonErr = UnlockCommonRequests.getUnlockCodeMeaning(
+                    code, json
+                )
                 logger.error(
                     StringBuilder().append("Failed to unlock your device, Xiaomi server returned error ")
                         .append(code).append(":").append('\n').append(
                             "Error description: "
-                        ).append(
-                            UnlockCommonRequests.getUnlockCodeMeaning(
-                                code, json
-                            )
-                        ).append('\n').append("Server description: ").append(description).toString()
+                        ).append(commonErr).append('\n').append("Server description: ")
+                        .append(description).toString()
                 )
                 return 1
             } else {
                 unlockTokenCache[token] = encryptData
-                if (isDebug) {
-                    logger.info("Device unlock token: $encryptData")
-                }
             }
-//            logger.info("Unlocking device using fastboot")
-//            val unlocked = FastbootCommons.oemUnlock(serial, encryptData)
-//            if (unlocked) {
-//                logger.error(
-//                    "Failed to unlock the device, fastboot exit with status non zero or internal error: Last error: ${
-//                        FastbootCommons.getLastError(
-//                            serial
-//                        )
-//                    }"
-//                )
-//                return 1
-//            }
+            logger.info("Unlocking device using fastboot")
+            val unlocked = FastbootCommons.oemUnlock(serial, encryptData)
+            if (!unlocked) {
+                val lastErr = FastbootCommons.getLastError(serial)
+                logger.error(
+                    "Failed to unlock the device, fastboot exit with status non zero or internal error: $lastErr"
+                )
+                return 1
+            }
         } catch (e: XiaomiProcedureException) {
             logger.error("Xiaomi procedure failed: ${e.message}")
             return 1
