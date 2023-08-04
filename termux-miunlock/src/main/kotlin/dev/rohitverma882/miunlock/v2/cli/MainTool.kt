@@ -1,8 +1,10 @@
 package dev.rohitverma882.miunlock.v2.cli
 
+import dev.rohitverma882.miunlock.v2.inet.CustomHttpException
 import dev.rohitverma882.miunlock.v2.logging.impl.DefaultCliLogger
 import dev.rohitverma882.miunlock.v2.utils.Utils
 import dev.rohitverma882.miunlock.v2.xiaomi.XiaomiKeystore
+import dev.rohitverma882.miunlock.v2.xiaomi.XiaomiProcedureException
 import dev.rohitverma882.miunlock.v2.xiaomi.unlock.UnlockCommonRequests
 
 import org.apache.commons.codec.DecoderException
@@ -24,15 +26,12 @@ import java.util.concurrent.Callable
 @Command(
     name = "termux-miunlock",
     versionProvider = VersionProvider::class,
-    footer = ["Copyright(c) 2023"],
     description = ["A program that can be used to retrieve the bootloader unlock token for @|bold Xiaomi|@ devices. (and unlock the bootloader) using @|bold Termux|@."],
     mixinStandardHelpOptions = true,
-//    showEndOfOptionsDelimiterInUsageHelp = true,
     usageHelpAutoWidth = true,
     sortOptions = false,
     sortSynopsis = false,
     showDefaultValues = true,
-//    separator = "::",
     requiredOptionMarker = '*',
     abbreviateSynopsis = true
 )
@@ -66,7 +65,7 @@ class MainTool : Callable<Int> {
         if (Utils.hosts.containsKey(region)) {
             host = (Utils.hosts[region] ?: Utils.hosts["india"]!!)
         } else {
-            throw ParameterException(spec.commandLine(), "Invalid --region value: $region")
+            throw ParameterException(spec.commandLine(), "Invalid region value: $region")
         }
     }
 
@@ -86,20 +85,22 @@ class MainTool : Callable<Int> {
             String(Hex.decodeHex(data), StandardCharsets.UTF_8)
         } catch (e: DecoderException) {
             throw ParameterException(
-                spec.commandLine(), "Decode response data failed: ${e.message}"
+                spec.commandLine(), "Failed to decode response data: ${e.message}"
             )
         }
         try {
             val json = JSONObject(jsonData)
-            passToken = json.optString("passToken", null)
-            userId = json.optString("userId", null)
-            deviceId = json.optString("deviceId", null)
+            passToken = json.getString("passToken")
+            userId = json.getString("userId")
+            deviceId = json.getString("deviceId")
         } catch (e: JSONException) {
-            throw ParameterException(spec.commandLine(), "Parse response data failed: ${e.message}")
+            throw ParameterException(
+                spec.commandLine(), "Failed to parse response data: ${e.message}"
+            )
         }
     }
 
-    private val UNLOCK_TOKEN_CACHE: HashMap<String, String> = HashMap()
+    private val unlockTokenCache: HashMap<String, String> = HashMap()
     private val logger = DefaultCliLogger()
 
     override fun call(): Int {
@@ -140,26 +141,33 @@ class MainTool : Callable<Int> {
             val description = json.optString("descEN", "empty")
             val encryptedData = json.optString("encryptedData", null)
             if (code != 0 && encryptedData.isNullOrBlank()) {
-                logger.error(
-                    "Failed to unlock your device, Xiaomi server returned error $code"
-                )
-                logger.error(
-                    "Error description: ${
-                        UnlockCommonRequests.getUnlockCodeMeaning(
-                            code, json
-                        )
-                    }"
-                )
-                logger.error("Server description: $description")
+                val error =
+                    StringBuilder().append("Failed to unlock your device, Xiaomi server returned error ")
+                        .append(code).append(":").append('\n')
+                error.append(
+                    "Error description: "
+                ).append(
+                    UnlockCommonRequests.getUnlockCodeMeaning(
+                        code, json
+                    )
+                ).append('\n')
+                error.append("Server description: ").append(description)
+                logger.error(error.toString().trim())
             } else {
-                UNLOCK_TOKEN_CACHE[token] = encryptedData
-                if (isDebug) logger.info("Unlock token: $encryptedData")
+                unlockTokenCache[token] = encryptedData
+                if (isDebug) logger.info("Final encrypted unlock token: $encryptedData")
             }
+        } catch (e: XiaomiProcedureException) {
+            throw UnlockException(e)
+        } catch (e: CustomHttpException) {
+            throw UnlockException(e)
+        } catch (e: UnlockException) {
+            throw e
+//            logger.error(e.message ?: e.stackTraceToString())
         } catch (e: Exception) {
             logger.error("Internal error while parsing unlock data: ${e.message}")
             return 1
         }
-
         XiaomiKeystore.clear()
         return 0
     }
