@@ -119,12 +119,13 @@ class MainTool : Callable<Int> {
         if (serial.isNullOrBlank()) {
             logger.error("No any fastboot devices found")
             return 1
+        } else {
+            logger.info("Found device: $serial")
         }
 
         logger.info("Starting unlock procedure")
         val product = FastbootCommons.getvar("product", serial)
-        Thread.sleep(600)
-        if (product == null) {
+        if (product.isNullOrBlank()) {
             val lastErr = FastbootCommons.getLastError(
                 serial
             )
@@ -158,7 +159,7 @@ class MainTool : Callable<Int> {
                 .toString()
         )
         val token = FastbootCommons.getUnlockToken(serial)
-        if (token == null) {
+        if (token.isNullOrBlank()) {
             val lastErr = FastbootCommons.getLastError(
                 serial
             )
