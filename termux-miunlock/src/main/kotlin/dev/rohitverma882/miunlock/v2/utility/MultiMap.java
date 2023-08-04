@@ -1,4 +1,4 @@
-package dev.rohitverma882.miunlock.v2.utils;
+package dev.rohitverma882.miunlock.v2.utility;
 
 import java.util.ArrayList;
 import java.util.HashMap;

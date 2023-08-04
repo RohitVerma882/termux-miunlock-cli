@@ -4,7 +4,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import dev.rohitverma882.miunlock.v2.utils.InetUtils;
+import dev.rohitverma882.miunlock.v2.utility.utils.InetUtils;
 
 public class HttpQuery extends LinkedHashMap<String, Object> {
     @Override

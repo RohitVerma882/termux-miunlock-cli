@@ -11,8 +11,8 @@ import dev.rohitverma882.miunlock.v2.crypto.Hash;
 import dev.rohitverma882.miunlock.v2.inet.CustomHttpException;
 import dev.rohitverma882.miunlock.v2.inet.EasyHttp;
 import dev.rohitverma882.miunlock.v2.inet.EasyResponse;
-import dev.rohitverma882.miunlock.v2.utils.InetUtils;
-import dev.rohitverma882.miunlock.v2.utils.Utils;
+import dev.rohitverma882.miunlock.v2.utility.utils.InetUtils;
+import dev.rohitverma882.miunlock.v2.utility.utils.Utils;
 
 public class XiaomiServiceEntry {
     private static final String URL_FIRST = "https://account.xiaomi.com/pass/serviceLogin?sid=%s&_json=true&passive=true&hidden=false";

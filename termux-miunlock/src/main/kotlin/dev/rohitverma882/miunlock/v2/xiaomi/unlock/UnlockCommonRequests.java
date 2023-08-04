@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import dev.rohitverma882.miunlock.v2.inet.CustomHttpException;
-import dev.rohitverma882.miunlock.v2.utils.StrUtils;
+import dev.rohitverma882.miunlock.v2.utility.utils.StrUtils;
 import dev.rohitverma882.miunlock.v2.xiaomi.XiaomiKeystore;
 import dev.rohitverma882.miunlock.v2.xiaomi.XiaomiProcedureException;
 

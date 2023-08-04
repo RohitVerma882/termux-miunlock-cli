@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import dev.rohitverma882.miunlock.v2.utils.MultiMap;
+import dev.rohitverma882.miunlock.v2.utility.MultiMap;
 
 public class EasyResponse {
     MultiMap<String, String> headers;

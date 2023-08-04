@@ -1,4 +1,4 @@
-package dev.rohitverma882.miunlock.v2.cli;
+package dev.rohitverma882.miunlock.v2.xiaomi.unlock;
 
 import java.util.Objects;
 

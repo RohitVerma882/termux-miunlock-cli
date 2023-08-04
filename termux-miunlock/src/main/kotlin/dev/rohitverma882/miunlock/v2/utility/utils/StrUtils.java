@@ -1,4 +1,4 @@
-package dev.rohitverma882.miunlock.v2.utils;
+package dev.rohitverma882.miunlock.v2.utility.utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;

@@ -1,4 +1,4 @@
-package dev.rohitverma882.miunlock.v2.utils;
+package dev.rohitverma882.miunlock.v2.utility.utils;
 
 import java.net.URLEncoder;
 import java.io.UnsupportedEncodingException;
