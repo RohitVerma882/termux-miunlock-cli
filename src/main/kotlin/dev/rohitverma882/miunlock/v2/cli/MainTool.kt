@@ -71,14 +71,14 @@ class MainTool : Callable<Int> {
     }
 
     @Option(
-        names = ["--token"], paramLabel = "TOKEN", description = ["Manual mode to provide token"]
+        names = ["--token"], paramLabel = "TOKEN", description = ["Used to verify device token"]
     )
     private var token: String? = null
 
     @Option(
         names = ["--product"],
         paramLabel = "PRODUCT",
-        description = ["Manual mode to provide product"]
+        description = ["Used to verify device product"]
     )
     private var product: String? = null
 
@@ -131,13 +131,13 @@ class MainTool : Callable<Int> {
             serial = if (devices.isEmpty()) {
                 null
             } else {
-                devices.first()
+                devices.first().split(Regex("(.*?)(\\s*fastboot)"), limit = 2)[0]
             }
         }
 
         if (useFastboot) {
             if (serial.isNullOrBlank()) {
-                logger.error("No any fastboot devices found")
+                logger.error("No any fastboot device found")
                 return 1
             } else {
                 logger.info("Found device: $serial")
