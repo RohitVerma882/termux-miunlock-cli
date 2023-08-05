@@ -40,15 +40,10 @@ tasks {
         dependsOn(shadowJar)
     }
     shadowJar {
-        archivesBaseName = "termux-miunlock"
+        archiveBaseName.set("termux-miunlock")
         archiveClassifier.set("all")
-        from(sourceSets.main.output)
-        configurations = [
-                project.configurations.shadow,
-                project.configurations.runtimeClasspath
-        ]
         manifest {
-            attributes["Main-Class"] = "dev.rohitverma882.miunlock.v2.cli.MainKt"
+            attributes("Main-Class" to "dev.rohitverma882.miunlock.v2.cli.MainKt")
         }
         exclude("META-INF/*.SF")
         exclude("META-INF/*.DSA")
