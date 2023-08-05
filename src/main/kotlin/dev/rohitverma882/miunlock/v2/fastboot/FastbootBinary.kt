@@ -9,7 +9,7 @@ internal object FastbootBinary {
     val FASTBOOT_BINARY: File? by lazy { find() }
 
     private fun find(): File? {
-        return findViaWhich() ?: findViaPrefix()
+        return findViaPrefix() ?: findViaWhich()
     }
 
     private fun findViaWhich(): File? {
