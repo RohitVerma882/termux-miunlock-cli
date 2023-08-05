@@ -12,7 +12,7 @@ import dev.rohitverma882.miunlock.v2.process.FastbootRunner;
 import dev.rohitverma882.miunlock.v2.process.ProcessRunner;
 
 public class FastbootCommons {
-    private static final int DEFAULT_TIMEOUT = Integer.MAX_VALUE;
+    private static final int DEFAULT_TIMEOUT = 6;
     private static final HashMap<String, String> LAST_ERROR_MAP = new HashMap<>();
 
     public static String command_string(String cmd) {

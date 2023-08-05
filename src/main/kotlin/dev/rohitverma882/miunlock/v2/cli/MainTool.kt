@@ -70,6 +70,20 @@ class MainTool : Callable<Int> {
         }
     }
 
+    @Option(
+        names = ["--token"], paramLabel = "TOKEN", description = ["Manual mode to provide token"]
+    )
+    private var token: String? = null
+
+    @Option(
+        names = ["--product"],
+        paramLabel = "PRODUCT",
+        description = ["Manual mode to provide product"]
+    )
+    private var product: String? = null
+
+    private var useFastboot: Boolean = false
+
     @Spec
     private lateinit var spec: CommandSpec
 
@@ -101,7 +115,7 @@ class MainTool : Callable<Int> {
         }
     }
 
-    private val unlockTokenCache: HashMap<String, String> = HashMap()
+    private val unlockTokenCache: HashMap<String?, String> = HashMap()
     private val logger = DefaultCliLogger()
 
     override fun call(): Int {
@@ -109,30 +123,39 @@ class MainTool : Callable<Int> {
         keystore.setCredentials(userId, passToken, deviceId)
         logger.info("Logged in succesfully: $userId")
 
-        val devices = FastbootCommons.devices()
-        val serial = if (devices.isEmpty()) {
-            null
-        } else {
-            devices.first()
+        useFastboot = (token.isNullOrBlank() || product.isNullOrBlank())
+
+        var serial: String? = null
+        if (useFastboot) {
+            val devices = FastbootCommons.devices()
+            serial = if (devices.isEmpty()) {
+                null
+            } else {
+                devices.first()
+            }
         }
 
-        if (serial.isNullOrBlank()) {
-            logger.error("No any fastboot devices found")
-            return 1
-        } else {
-            logger.info("Found device: $serial")
+        if (useFastboot) {
+            if (serial.isNullOrBlank()) {
+                logger.error("No any fastboot devices found")
+                return 1
+            } else {
+                logger.info("Found device: $serial")
+            }
         }
 
         logger.info("Starting unlock procedure")
-        val product = FastbootCommons.getvar("product", serial)
-        if (product.isNullOrBlank()) {
-            val lastErr = FastbootCommons.getLastError(
-                serial
-            )
-            logger.error(
-                "Failed to get fastboot variable product: $lastErr"
-            )
-            return 1
+        if (useFastboot) {
+            product = FastbootCommons.getvar("product", serial)
+            if (product.isNullOrBlank()) {
+                val lastErr = FastbootCommons.getLastError(
+                    serial
+                )
+                logger.error(
+                    "Failed to get fastboot variable product: $lastErr"
+                )
+                return 1
+            }
         }
         try {
             logger.info("Checking account unlock availability")
@@ -158,15 +181,17 @@ class MainTool : Callable<Int> {
                 .append("If your Xiaomi account has been bound to the device for enough time, the server is going to provide the unlock token and this tool will proceed with the unlock procedure.")
                 .toString()
         )
-        val token = FastbootCommons.getUnlockToken(serial)
-        if (token.isNullOrBlank()) {
-            val lastErr = FastbootCommons.getLastError(
-                serial
-            )
-            logger.error(
-                "Failed to get the device unlock token: $lastErr"
-            )
-            return 1
+        if (useFastboot) {
+            token = FastbootCommons.getUnlockToken(serial)
+            if (token.isNullOrBlank()) {
+                val lastErr = FastbootCommons.getLastError(
+                    serial
+                )
+                logger.error(
+                    "Failed to get the device unlock token: $lastErr"
+                )
+                return 1
+            }
         }
         logger.info("Unlock request token: $token")
         try {
@@ -198,14 +223,18 @@ class MainTool : Callable<Int> {
             } else {
                 unlockTokenCache[token] = encryptData
             }
-            logger.info("Unlocking device using fastboot")
-            val unlocked = FastbootCommons.oemUnlock(serial, encryptData)
-            if (!unlocked) {
-                val lastErr = FastbootCommons.getLastError(serial)
-                logger.error(
-                    "Failed to unlock the device, fastboot exit with status non zero or internal error: $lastErr"
-                )
-                return 1
+            if (useFastboot) {
+                logger.info("Unlocking device using fastboot")
+                val unlocked = FastbootCommons.oemUnlock(serial, encryptData)
+                if (!unlocked) {
+                    val lastErr = FastbootCommons.getLastError(serial)
+                    logger.error(
+                        "Failed to unlock the device, fastboot exit with status non zero or internal error: $lastErr"
+                    )
+                    return 1
+                }
+            } else {
+                logger.info("Unlock device token: $encryptData")
             }
         } catch (e: XiaomiProcedureException) {
             logger.error("Xiaomi procedure failed: ${e.message}")
