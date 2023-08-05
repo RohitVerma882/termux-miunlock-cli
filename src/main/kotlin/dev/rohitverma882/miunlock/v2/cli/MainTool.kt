@@ -90,7 +90,7 @@ class MainTool : Callable<Int> {
 
     @Parameters(
         paramLabel = "DATA",
-        description = ["Install 'miunlock-account-v2.apk' from repo, login and copypaste the response."],
+        description = ["Install 'miunlock-account.apk' from repo, login and copypaste the response."],
     )
     private fun setLoginData(data: String) {
         val jsonData = try {
