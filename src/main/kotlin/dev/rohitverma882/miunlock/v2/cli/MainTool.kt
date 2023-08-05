@@ -159,7 +159,7 @@ class MainTool : Callable<Int> {
                     code, json
                 )
                 logger.error(
-                    StringBuilder().append("Failed to unlock your device, Xiaomi server returned error ")
+                    StringBuilder().append("Xiaomi server returned error ")
                         .append(code).append(":").append('\n').append(
                             "Error description: "
                         ).append(commonErr).append('\n').append("Server description: ")
