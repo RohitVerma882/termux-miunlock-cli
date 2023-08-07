@@ -90,7 +90,7 @@ class MainTool : Callable<Int> {
 
     @Parameters(
         paramLabel = "DATA",
-        description = ["Install 'miunlock-account.apk' from repo, login and copypaste the response."],
+        description = ["Install account.apk from repo, login and copypaste the response."],
     )
     private fun setLoginData(data: String) {
         val jsonData = try {
@@ -120,7 +120,7 @@ class MainTool : Callable<Int> {
         keystore.setCredentials(userId, passToken, deviceId)
         logger.info("Logged in succesfully: $userId")
 
-        logger.info("Starting unlock procedure")
+        logger.info("Starting get unlock token procedure")
         try {
             logger.info("Checking account unlock availability")
             val info = UnlockCommonRequests.userInfo(host)
