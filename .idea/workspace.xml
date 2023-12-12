@@ -5,13 +5,46 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7a9a3729-e9f4-4f01-b51d-295178af4529" name="Changes" comment="cleanup">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/kotlinc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/kotlinc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.jar" beforeDir="false" afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/v2/cli/Main.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/cli/Main.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/v2/cli/MainTool.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/cli/MainTool.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/v2/cli/RegionCandidates.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/cli/RegionCandidates.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/v2/cli/VersionProvider.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/cli/VersionProvider.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/v2/crypto/AES.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/crypto/AES.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/v2/crypto/Hash.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/crypto/Hash.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/v2/inet/CustomHttpException.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/inet/CustomHttpException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/v2/inet/CustomHttpRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/inet/CustomHttpRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/v2/inet/EasyHttp.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/inet/EasyHttp.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/v2/inet/EasyResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/inet/EasyResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/v2/inet/HttpQuery.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/inet/HttpQuery.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/v2/logging/CliLogger.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/logging/CliLogger.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/v2/logging/impl/DefaultCliLogger.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/logging/impl/DefaultCliLogger.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/v2/logging/impl/FlushingStreamHandler.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/logging/impl/FlushingStreamHandler.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/v2/utility/MultiMap.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/utility/MultiMap.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/v2/utility/utils/InetUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/utility/utils/InetUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/v2/utility/utils/StrUtils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/utility/utils/StrUtils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/v2/utility/utils/Utils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/utility/utils/Utils.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/v2/xiaomi/XiaomiCrypto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/xiaomi/XiaomiCrypto.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/v2/xiaomi/XiaomiKeystore.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/xiaomi/XiaomiKeystore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/v2/xiaomi/XiaomiProcedureException.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/xiaomi/XiaomiProcedureException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/v2/xiaomi/XiaomiServiceEntry.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/xiaomi/XiaomiServiceEntry.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/v2/xiaomi/unlock/UnlockCommonRequests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/xiaomi/unlock/UnlockCommonRequests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/v2/xiaomi/unlock/UnlockRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/dev/rohitverma882/miunlock/xiaomi/unlock/UnlockRequest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
   </component>
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
@@ -54,6 +87,7 @@
     <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectId" id="2TThcSjuVofhxADjwefhCSQaUxO" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -63,8 +97,9 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.cidr.known.project.marker": "true",
-    "android.gradle.sync.needed": "true",
+    "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
+    "git-widget-placeholder": "main",
     "last_opened_file_path": "C:/Users/Rohit Verma/AndroidStudioProjects/termux-miunlock-cli",
     "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.0",

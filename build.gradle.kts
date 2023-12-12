@@ -1,5 +1,5 @@
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.8.20"
+    id("org.jetbrains.kotlin.jvm") version "1.9.0"
     id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
@@ -43,7 +43,7 @@ tasks {
         archiveBaseName.set("termux-miunlock")
         archiveClassifier.set("all")
         manifest {
-            attributes("Main-Class" to "dev.rohitverma882.miunlock.v2.cli.MainKt")
+            attributes("Main-Class" to "dev.rohitverma882.miunlock.cli.MainKt")
         }
         exclude("META-INF/*.SF")
         exclude("META-INF/*.DSA")
