@@ -1,5 +1,7 @@
 package dev.rohitverma882.miunlock.xiaomi;
 
+import static dev.rohitverma882.miunlock.Consts.URL_FIRST;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -11,13 +13,10 @@ import dev.rohitverma882.miunlock.crypto.Hash;
 import dev.rohitverma882.miunlock.inet.CustomHttpException;
 import dev.rohitverma882.miunlock.inet.EasyHttp;
 import dev.rohitverma882.miunlock.inet.EasyResponse;
-import dev.rohitverma882.miunlock.utility.utils.InetUtils;
 import dev.rohitverma882.miunlock.utility.utils.Utils;
 
 public class XiaomiServiceEntry {
-    private static final String URL_FIRST = "https://account.xiaomi.com/pass/serviceLogin?sid=%s&_json=true&passive=true&hidden=false";
-    private XiaomiKeystore keystore;
-    private String id;
+    private final String id;
     private String serviceToken;
     private String ssecurity;
     private String psecurity;
@@ -27,6 +26,8 @@ public class XiaomiServiceEntry {
     private String nonce;
     private String cUserId;
     private int code;
+
+    private final XiaomiKeystore keystore;
 
     public XiaomiServiceEntry(String id, XiaomiKeystore keystore) {
         this.id = id;
@@ -46,19 +47,21 @@ public class XiaomiServiceEntry {
         if (keystore.getPassToken() == null) {
             throw new XiaomiProcedureException("[getSSecurity] PassToken missing, please login", XiaomiProcedureException.ExceptionCode.NEED_LOGIN);
         }
-        String url = String.format(URL_FIRST, this.getServiceId());
+
         HashMap<String, String> cookies = new LinkedHashMap<>();
         cookies.put("passToken", keystore.getPassToken());
         cookies.put("userId", keystore.getUserId());
         cookies.put("deviceId", keystore.getDeviceId());
-        EasyHttp request = new EasyHttp().url(url).cookies(cookies);
-        EasyResponse response;
-        response = request.exec();
+
+        EasyHttp request = new EasyHttp().url(URL_FIRST).cookies(cookies);
+        EasyResponse response = request.exec();
+
         String body = response.getBody();
         body = Utils.findJsonStart(body);
         if (body == null) {
             throw new XiaomiProcedureException("[getSSecurity] Failed to find SSecurity json");
         }
+
         try {
             JSONObject json = new JSONObject(body);
             this.ssecurity = json.getString("ssecurity");
@@ -78,8 +81,9 @@ public class XiaomiServiceEntry {
         if (url == null) {
             throw new XiaomiProcedureException("[getServiceToken] Cannot sign location, maybe missing parameters or failed hash");
         }
-        EasyResponse response;
-        response = EasyHttp.get(url);
+
+        EasyResponse response = EasyHttp.get(url);
+
         HashMap<String, String> cookies = response.getCookies();
         serviceToken = cookies.get("serviceToken");
         if (serviceToken == null) {
@@ -89,16 +93,11 @@ public class XiaomiServiceEntry {
         ph_key = cookies.get(id + "_ph");
     }
 
-    private void httpGetSSAndST() throws XiaomiProcedureException, CustomHttpException {
-        httpGetSSecurity();
-        httpGetServiceToken();
-    }
-
     private String signedLocation() {
         if (this.location == null || this.nonce == null || this.ssecurity == null) {
             return null;
         }
-        String sign = InetUtils.urlEncode(Hash.sha1Base64("nonce=" + nonce + "&" + ssecurity));
+        String sign = Utils.urlEncode(Hash.sha1Base64("nonce=" + nonce + "&" + ssecurity));
         if (sign == null) {
             return null;
         }

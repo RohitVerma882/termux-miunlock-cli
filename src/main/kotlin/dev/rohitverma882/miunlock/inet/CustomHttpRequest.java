@@ -47,13 +47,17 @@ public class CustomHttpRequest {
     }
 
     private Type requestType = Type.GET;
-    private LinkedHashMap<String, String> headers;
+    private final LinkedHashMap<String, String> headers;
     private HttpQuery postParams;
+
     private String proxyHost;
     private int proxyPort = -1;
+
     private String url;
+
     private HttpResponse response;
     private HttpRequest request;
+
     private byte[] postData;
     private InputStream postInputStream;
 

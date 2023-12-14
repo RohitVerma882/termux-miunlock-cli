@@ -3,6 +3,7 @@ package dev.rohitverma882.miunlock.utility.utils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
@@ -11,10 +12,10 @@ public class StrUtils {
     static final String CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
     public static String randomWord(int len) {
-        int clen = CHARS.length();
+        int clean = CHARS.length();
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < len; ++i) {
-            builder.append(CHARS.charAt(ThreadLocalRandom.current().nextInt(0, clen)));
+            builder.append(CHARS.charAt(ThreadLocalRandom.current().nextInt(0, clean)));
         }
         return builder.toString();
     }
@@ -28,8 +29,7 @@ public class StrUtils {
             return new JSONObject(map).toString(indent);
         }
         final String NL = indent > 0 ? "\n" : "";
-        String in = indentToString(indent);
-        final String IN = in;
+        final String IN = indentToString(indent);
         StringBuilder stringBuilder = new StringBuilder("{");
         for (Map.Entry entry : map.entrySet()) {
             String toAdd;
@@ -52,9 +52,7 @@ public class StrUtils {
             return "";
         }
         char[] ic = new char[indent];
-        for (int i = 0; i < indent; ++i) {
-            ic[i] = ' ';
-        }
+        Arrays.fill(ic, ' ');
         return new String(ic);
     }
 }

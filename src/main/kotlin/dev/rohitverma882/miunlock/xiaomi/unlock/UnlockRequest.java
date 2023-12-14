@@ -1,9 +1,11 @@
 package dev.rohitverma882.miunlock.xiaomi.unlock;
 
+import static dev.rohitverma882.miunlock.Consts.SERVICE_NAME;
+import static dev.rohitverma882.miunlock.Consts.getUNLOCK_HMAC_KEY;
+
 import org.json.JSONObject;
 
 import java.util.Base64;
-import java.util.HashMap;
 
 import dev.rohitverma882.miunlock.inet.CustomHttpException;
 import dev.rohitverma882.miunlock.inet.EasyHttp;
@@ -14,13 +16,13 @@ import dev.rohitverma882.miunlock.xiaomi.XiaomiKeystore;
 import dev.rohitverma882.miunlock.xiaomi.XiaomiProcedureException;
 
 public class UnlockRequest {
-    private static final String SERVICE_NAME = "unlockApi";
-    private HashMap<String, String> headers = new HashMap<>();
-    private String path;
-    private String host;
     private HttpQuery params = new HttpQuery();
+
+    private final String path;
+    private final String host;
+
     private String signHmac, signSha;
-    private boolean encrypt;
+    private final boolean encrypt;
 
     public UnlockRequest(String path, String host) {
         this(path, host, true);
@@ -34,11 +36,14 @@ public class UnlockRequest {
 
     public String exec() throws XiaomiProcedureException, CustomHttpException {
         String[] keyToken = XiaomiKeystore.getInstance().requireServiceKeyAndToken(SERVICE_NAME);
-        signHmac = XiaomiCrypto.cloudService_signHmac(XiaomiCrypto.UNLOCK_HMAC_KEY, "POST", path, params.sorted().toString());
+
+        signHmac = XiaomiCrypto.cloudService_signHmac(getUNLOCK_HMAC_KEY(), "POST", path, params.sorted().toString());
         params.put("sign", signHmac);
+
         String key = keyToken[0];
         String serviceToken = keyToken[1];
         params = params.sorted();
+
         if (this.encrypt) {
             try {
                 XiaomiCrypto.cloudService_encryptRequestParams(params, key);
@@ -49,10 +54,11 @@ public class UnlockRequest {
             params.put("signature", signSha);
         }
 
-        EasyResponse response = new EasyHttp().url(host + path).fields(params).headers(headers).userAgent("XiaomiPCSuite").cookies(XiaomiKeystore.getInstance().requireServiceCookies(SERVICE_NAME)).exec();
+        EasyResponse response = new EasyHttp().url(host + path).fields(params).userAgent("XiaomiPCSuite").cookies(XiaomiKeystore.getInstance().requireServiceCookies(SERVICE_NAME)).exec();
         if (!response.isAllRight()) {
             throw new XiaomiProcedureException("[UnlockRequest.exec] Invalid server respose: code: " + response.getCode() + ", lenght: " + response.getBody().length());
         }
+
         String body = response.getBody();
         if (encrypt) {
             try {
@@ -85,9 +91,5 @@ public class UnlockRequest {
         } catch (Exception e) {
             throw new XiaomiProcedureException("[UnlockRequest.addNonce] Exception while parsing nonce response: " + e.getMessage());
         }
-    }
-
-    public void setHeader(String name, String value) {
-        this.headers.put(name, value);
     }
 }

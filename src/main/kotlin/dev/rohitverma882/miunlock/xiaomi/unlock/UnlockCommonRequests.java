@@ -1,13 +1,18 @@
 package dev.rohitverma882.miunlock.xiaomi.unlock;
 
+import static dev.rohitverma882.miunlock.Consts.AHAUNLOCKV3;
+import static dev.rohitverma882.miunlock.Consts.CLIENT_VERSION;
+import static dev.rohitverma882.miunlock.Consts.DEVICECLEARV3;
+import static dev.rohitverma882.miunlock.Consts.NONCEV2;
+import static dev.rohitverma882.miunlock.Consts.SID;
+import static dev.rohitverma882.miunlock.Consts.USERINFOV3;
+
 import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Objects;
 
 import dev.rohitverma882.miunlock.inet.CustomHttpException;
 import dev.rohitverma882.miunlock.utility.utils.StrUtils;
@@ -16,28 +21,6 @@ import dev.rohitverma882.miunlock.xiaomi.XiaomiProcedureException;
 
 public class UnlockCommonRequests {
     private static final HashMap<Integer, String> UNLOCK_CODE_MEANING = buildUnlockCodeMeaning();
-    private static final String SID = "miui_unlocktool_client";
-    private static final String CLIENT_VERSION = "5.5.224.55";
-    private static final String NONCEV2 = "/api/v2/nonce";
-    private static final String USERINFOV3 = "/api/v3/unlock/userinfo";
-    private static final String DEVICECLEARV3 = "/api/v2/unlock/device/clear";
-    private static final String AHAUNLOCKV3 = "/api/v3/ahaUnlock";
-    private static final String AGREE = "/v1/unlock/agree";
-
-    private static String OVERRIDE_CLIENT_VERSION = null;
-    private static Map<String, Object> OVERRIDE_UNLOCK_REQUEST = null;
-
-    private static String getClientVersion() {
-        return Objects.requireNonNullElse(OVERRIDE_CLIENT_VERSION, CLIENT_VERSION);
-    }
-
-    public static void overrideClientVersion(String version) {
-        OVERRIDE_CLIENT_VERSION = version;
-    }
-
-    public static void overrideUnlockOptions(Map<String, Object> overrideFields) {
-        OVERRIDE_UNLOCK_REQUEST = overrideFields;
-    }
 
     public static String getUnlockCodeMeaning(int code, JSONObject object) {
         String code_meaning = UNLOCK_CODE_MEANING.get(code);
@@ -50,8 +33,7 @@ public class UnlockCommonRequests {
             {
                 try {
                     hours = object.getJSONObject("data").getInt("waitHour");
-                } catch (Throwable t) {
-//                    Log.error("Failed to get waitHour for unlock");
+                } catch (Throwable ignored) {
                 }
                 if (hours >= 0) {
                     int days = hours / 24;
@@ -69,9 +51,10 @@ public class UnlockCommonRequests {
 
     private static HashMap<Integer, String> buildUnlockCodeMeaning() {
         HashMap<Integer, String> map = new HashMap<>();
-        map.put(10000, "10000:Request parameter error");
+        map.put(-1, "Unknown error: %1$d");
+        map.put(10000, "10000:Request parameter error, this can be caused by entering invalid token or product");
         map.put(10001, "10001:Signature verification failed");
-        map.put(10002, "10002:The same IP request too often");
+        map.put(10002, "10002:The same IP request too often (Too many tries)");
         map.put(10003, "10003:Internal server error");
         map.put(10004, "10004:Request has expired");
         map.put(10005, "10005:Invalid Nonce request");
@@ -81,7 +64,7 @@ public class UnlockCommonRequests {
         map.put(20032, "Failed to generate signature value required to unlock");
         map.put(20033, "User portrait scores too low or black");
         map.put(20034, "Current account cannot unlock this device");
-        map.put(20035, "This tool is outdated, if you want to unlock your device then go to unlock.update.miui.com to download the latest version of MiUnlock");
+        map.put(20035, "This tool is outdated, contact the developers.");
         map.put(20036, "Your account has been bound to this device for not enough time\nYou have to wait %1$d days and %2$d hours before you can unlock this device");
         map.put(20037, "Unlock number has reached the upper limit");
         map.put(20041, "Your Xiaomi account isn't associated with a phone number\nGo to account.xiaomi.com and associate it with your phone number");
@@ -97,10 +80,11 @@ public class UnlockCommonRequests {
 
     public static String userInfo(String host) throws XiaomiProcedureException, CustomHttpException {
         XiaomiKeystore keystore = XiaomiKeystore.getInstance();
+
         UnlockRequest request = new UnlockRequest(USERINFOV3, host);
         HashMap<String, String> pp = new LinkedHashMap<>();
         pp.put("clientId", "1");
-        pp.put("clientVersion", getClientVersion());
+        pp.put("clientVersion", CLIENT_VERSION);
         pp.put("language", "en");
         pp.put("pcId", keystore.getPcId());
         pp.put("region", "");
@@ -113,22 +97,13 @@ public class UnlockCommonRequests {
         return request.exec();
     }
 
-    public static String agreeRequest(String host) throws XiaomiProcedureException, CustomHttpException {
-        XiaomiKeystore keystore = XiaomiKeystore.getInstance();
-        UnlockRequest request = new UnlockRequest(AGREE, host, false);
-        HashMap<String, String> pp = new LinkedHashMap<>();
-        request.addParam("uid", keystore.getUserId());
-        request.addParam("type", "UnlockTool");
-        request.addParam("sid", SID);
-        return request.exec();
-    }
-
     public static String deviceClear(String host, String product) throws XiaomiProcedureException, CustomHttpException {
         XiaomiKeystore keystore = XiaomiKeystore.getInstance();
+
         UnlockRequest request = new UnlockRequest(DEVICECLEARV3, host);
         HashMap<String, String> pp = new LinkedHashMap<>();
         pp.put("clientId", "1");
-        pp.put("clientVersion", getClientVersion());
+        pp.put("clientVersion", CLIENT_VERSION);
         pp.put("language", "en");
         pp.put("pcId", keystore.getPcId());
         pp.put("product", product);
@@ -147,6 +122,7 @@ public class UnlockCommonRequests {
             throw new XiaomiProcedureException("Invalid input argument: null product");
         }
         XiaomiKeystore keystore = XiaomiKeystore.getInstance();
+
         UnlockRequest request = new UnlockRequest(AHAUNLOCKV3, host);
         HashMap<String, String> p2 = new LinkedHashMap<>();
         p2.put("boardVersion", boardVersion);
@@ -155,7 +131,7 @@ public class UnlockCommonRequests {
         p2.put("socId", socId);
         HashMap<String, Object> pp = new LinkedHashMap<>();
         pp.put("clientId", "2");
-        pp.put("clientVersion", getClientVersion());
+        pp.put("clientVersion", CLIENT_VERSION);
         pp.put("deviceInfo", p2);
         pp.put("deviceToken", token);
         pp.put("language", "en");
@@ -163,9 +139,6 @@ public class UnlockCommonRequests {
         pp.put("pcId", keystore.getPcId());
         pp.put("region", "");
         pp.put("uid", keystore.getUserId());
-        if (OVERRIDE_UNLOCK_REQUEST != null) {
-            pp.putAll(OVERRIDE_UNLOCK_REQUEST);
-        }
         String data = StrUtils.map2json(pp, 3);
         data = Base64.getEncoder().encodeToString(data.getBytes(StandardCharsets.UTF_8));
         request.addParam("appId", "1");

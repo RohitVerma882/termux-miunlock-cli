@@ -1,7 +1,6 @@
 package dev.rohitverma882.miunlock.xiaomi;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -9,26 +8,23 @@ import java.util.UUID;
 import dev.rohitverma882.miunlock.inet.CustomHttpException;
 
 public class XiaomiKeystore {
-    private static XiaomiKeystore instance;
-    private HashMap<String, XiaomiServiceEntry> serviceMap = new HashMap<>();
+    private final HashMap<String, XiaomiServiceEntry> serviceMap = new HashMap<>();
+
     private String userId;
     private String passToken;
     private String deviceId;
     private String pcId;
 
-    public static void clear() {
-        instance = new XiaomiKeystore();
-    }
-
-    public static String generateDeviceId() {
-        return "wb_" + UUID.randomUUID().toString();
-    }
-
+    private static XiaomiKeystore instance;
     public static XiaomiKeystore getInstance() {
         if (instance == null) {
             instance = new XiaomiKeystore();
         }
         return instance;
+    }
+
+    public static void clear() {
+        instance = new XiaomiKeystore();
     }
 
     public String getUserId() {
@@ -46,6 +42,17 @@ public class XiaomiKeystore {
         return this.deviceId;
     }
 
+    public static String generateDeviceId() {
+        return "wb_" + UUID.randomUUID();
+    }
+
+    public String getPcId() {
+        if (pcId == null) {
+            pcId = DigestUtils.md5Hex(getDeviceId());
+        }
+        return pcId;
+    }
+
     public void setDeviceId(String pcId) {
         this.pcId = pcId;
     }
@@ -58,6 +65,10 @@ public class XiaomiKeystore {
 
     public void setCredentials(String userId, String passToken) {
         setCredentials(userId, passToken, generateDeviceId());
+    }
+
+    public boolean isLogged() {
+        return this.getUserId() != null && this.getPassToken() != null;
     }
 
     public String[] requireServiceKeyAndToken(String sid) throws XiaomiProcedureException, CustomHttpException {
@@ -77,37 +88,5 @@ public class XiaomiKeystore {
             serviceMap.put(sid, entry);
         }
         return entry.getCookies();
-    }
-
-    public boolean isLogged() {
-        return this.getUserId() != null && this.getPassToken() != null;
-    }
-
-    public String getPcId() {
-        if (pcId == null) {
-            pcId = DigestUtils.md5Hex(getDeviceId());
-        }
-        return pcId;
-    }
-
-    public String getJson() {
-        if (isEmpty()) {
-            return null;
-        }
-        JSONObject object = new JSONObject();
-        object.put("passToken", passToken);
-        object.put("userId", userId);
-        object.put("deviceId", deviceId);
-        return object.toString();
-    }
-
-    public void setCredentials(JSONObject object) {
-        passToken = object.optString("passToken", null);
-        userId = object.optString("userId", null);
-        deviceId = object.optString("deviceId", null);
-    }
-
-    public boolean isEmpty() {
-        return (passToken == null || userId == null || deviceId == null || passToken.isEmpty() || userId.isEmpty());
     }
 }

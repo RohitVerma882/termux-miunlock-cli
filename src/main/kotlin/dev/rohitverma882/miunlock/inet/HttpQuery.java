@@ -1,10 +1,10 @@
 package dev.rohitverma882.miunlock.inet;
 
+import static dev.rohitverma882.miunlock.utility.utils.Utils.urlEncode;
+
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import dev.rohitverma882.miunlock.utility.utils.InetUtils;
 
 public class HttpQuery extends LinkedHashMap<String, Object> {
     @Override
@@ -25,7 +25,7 @@ public class HttpQuery extends LinkedHashMap<String, Object> {
     public String toEncodedString(boolean encode) {
         StringBuilder builder = new StringBuilder();
         for (Map.Entry<String, Object> entry : super.entrySet()) {
-            builder.append(entry.getKey()).append('=').append(encode ? InetUtils.urlEncode(entry.getValue().toString()) : entry.getValue().toString()).append('&');
+            builder.append(entry.getKey()).append('=').append(encode ? urlEncode(entry.getValue().toString()) : entry.getValue().toString()).append('&');
         }
         builder.setLength(builder.length() - 1);
         return builder.toString();

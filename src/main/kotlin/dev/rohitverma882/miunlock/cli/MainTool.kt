@@ -1,8 +1,8 @@
 package dev.rohitverma882.miunlock.cli
 
+import dev.rohitverma882.miunlock.Consts.HOSTS
 import dev.rohitverma882.miunlock.inet.CustomHttpException
 import dev.rohitverma882.miunlock.logging.impl.DefaultCliLogger
-import dev.rohitverma882.miunlock.utility.utils.Utils
 import dev.rohitverma882.miunlock.xiaomi.XiaomiKeystore
 import dev.rohitverma882.miunlock.xiaomi.XiaomiProcedureException
 import dev.rohitverma882.miunlock.xiaomi.unlock.UnlockCommonRequests
@@ -24,9 +24,9 @@ import java.nio.charset.StandardCharsets
 import java.util.concurrent.Callable
 
 @Command(
-    name = "termux-miunlock",
+    name = "get_token",
     versionProvider = VersionProvider::class,
-    description = ["A program that can be used to retrieve the bootloader unlock token for @|bold Xiaomi|@ devices. (and unlock the bootloader) using @|bold Termux|@."],
+    description = ["A program that can be used to retrieve the bootloader unlock token for @|bold Xiaomi|@ devices. using @|bold Termux|@."],
     mixinStandardHelpOptions = true,
     usageHelpAutoWidth = true,
     showDefaultValues = true,
@@ -39,8 +39,7 @@ class MainTool : Callable<Int> {
 
     private var passToken: String? = null
     private var userId: String? = null
-
-    private val unlockTokenCache: HashMap<String?, String> = HashMap()
+    private var deviceId: String? = null
 
     private val logger = DefaultCliLogger()
 
@@ -65,7 +64,7 @@ class MainTool : Callable<Int> {
         names = ["--region"],
         paramLabel = "REGION",
         completionCandidates = RegionCandidates::class,
-        description = ["Tool server host regions: \${COMPLETION-CANDIDATES}"],
+        description = ["Tool server hosts or regions: \${COMPLETION-CANDIDATES}"],
         defaultValue = "india",
         showDefaultValue = CommandLine.Help.Visibility.ALWAYS
     )
@@ -74,8 +73,8 @@ class MainTool : Callable<Int> {
             host = region
             return
         }
-        if (Utils.hosts.containsKey(region)) {
-            host = (Utils.hosts[region] ?: Utils.hosts["global"]!!)
+        if (HOSTS.containsKey(region)) {
+            host = (HOSTS[region] ?: HOSTS["india"]!!)
         } else {
             throw ParameterException(spec.commandLine(), "Invalid region value: $region")
         }
@@ -97,30 +96,31 @@ class MainTool : Callable<Int> {
 
     @Parameters(
         paramLabel = "DATA",
-        description = ["Install account.apk from repo, login and copypaste the response."],
+        description = ["Install account.apk from repo, login and copy-paste the response."],
     )
     private fun setLoginData(data: String) {
         val jsonData = try {
             String(Hex.decodeHex(data), StandardCharsets.UTF_8)
         } catch (e: DecoderException) {
             throw ParameterException(
-                spec.commandLine(), "Failed to decode response data: ${e.message}"
+                spec.commandLine(), "Failed to decode response: ${e.message}"
             )
         }
         try {
             val json = JSONObject(jsonData)
             passToken = json.getString("passToken")
             userId = json.getString("userId")
+            deviceId = json.optString("deviceId")
         } catch (e: JSONException) {
             throw ParameterException(
-                spec.commandLine(), "Failed to parse response data: ${e.message}"
+                spec.commandLine(), "Failed to parse response: ${e.message}"
             )
         }
     }
 
     override fun call(): Int {
         val keystore = XiaomiKeystore.getInstance()
-        keystore.setCredentials(userId, passToken)
+        keystore.setCredentials(userId, passToken, deviceId)
         logger.info("Logged in succesfully: $userId")
 
         logger.info("Starting get unlock token procedure")
@@ -129,11 +129,6 @@ class MainTool : Callable<Int> {
             val info = UnlockCommonRequests.userInfo(host)
             if (!info.isNullOrBlank() && isDebug) {
                 logger.info("Unlock request user info: $info")
-            }
-
-            try {
-                UnlockCommonRequests.agreeRequest(host)
-            } catch (_: Exception) {
             }
 
             logger.info("Checking device unlock capability")
@@ -176,7 +171,6 @@ class MainTool : Callable<Int> {
                 return 1
             }
 
-            unlockTokenCache[token] = encryptData
             logger.info("Unlock device token: $encryptData")
         } catch (e: XiaomiProcedureException) {
             logger.error("Xiaomi procedure failed: ${e.message}")

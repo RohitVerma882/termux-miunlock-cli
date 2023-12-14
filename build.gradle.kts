@@ -10,8 +10,10 @@ repositories {
 
 dependencies {
     implementation("info.picocli:picocli:4.7.4")
+
     implementation("commons-codec:commons-codec:1.11")
     implementation("org.apache.httpcomponents:httpclient:4.5.5")
+
     implementation("org.json:json:20180130")
 }
 
@@ -40,7 +42,7 @@ tasks {
         dependsOn(shadowJar)
     }
     shadowJar {
-        archiveBaseName.set("termux-miunlock")
+        archiveBaseName.set("get_token")
         archiveClassifier.set("all")
         manifest {
             attributes("Main-Class" to "dev.rohitverma882.miunlock.cli.MainKt")

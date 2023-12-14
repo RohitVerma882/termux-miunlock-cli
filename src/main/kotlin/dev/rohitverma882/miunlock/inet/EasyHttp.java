@@ -4,10 +4,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class EasyHttp {
-    public static final String CHROME_USERAGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36";
-    private static final boolean DEBUG_PROXY = false;
     private final Map<String, String> cookies = new LinkedHashMap<>();
     protected CustomHttpRequest request = new CustomHttpRequest();
+
     private boolean headOnly = false;
 
     public static EasyResponse get(String url) throws CustomHttpException {
@@ -68,9 +67,6 @@ public class EasyHttp {
     }
 
     public EasyResponse exec() throws CustomHttpException {
-        if (DEBUG_PROXY) {
-            this.proxy("127.0.0.1", 8888);
-        }
         if (cookies.size() > 0) {
             StringBuilder cookieString = new StringBuilder();
             for (Map.Entry<String, String> entry : cookies.entrySet()) {
@@ -82,8 +78,7 @@ public class EasyHttp {
             request.setHeadRequest();
         }
         request.execute();
-        EasyResponse response = new EasyResponse(request.getResponseHeaders(), request.getResponseBody(), request.getResponseCode());
-        return response;
+        return new EasyResponse(request.getResponseHeaders(), request.getResponseBody(), request.getResponseCode());
     }
 
     public EasyHttp userAgent(String userAgent) {
